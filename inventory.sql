@@ -50,7 +50,14 @@ foreign key (InventoryID) references inventory(InventoryID)
 );
 
 
-use practice;
+select * from inventory_overdue_notification;
+
+create table inventory_overdue_notification(
+NotificationID int not null primary key auto_increment,
+LoanID int not null,
+notification_date date,
+foreign key (LoanID) references inventory_loan(LoanID)
+);
 
 
 select * from inventory_status;
@@ -104,3 +111,26 @@ values (1, 1, 1),
 (14, 3, 2),
 (15, 2, 2),
 (15, 1, 2);
+
+
+select * from inventory_loan;
+
+insert into inventory_loan(MemberID, InventoryID, checkout_date, due_date, return_date, days_overdue)
+values (1, 5, '2025-02-14', date_add('2025-02-14', interval 14 day), null, datediff(current_date(), date_add('2025-02-14', interval 14 day))),
+(4, 15, '2025-02-21', date_add('2025-02-21', interval 14 day), null, datediff(current_date(), date_add('2025-02-21', interval 14 day))),
+(5, 23, '2025-02-15', date_add('2025-02-15', interval 14 day), null, datediff(current_date(), date_add('2025-02-15', interval 14 day))),
+(2, 29, '2025-02-09', date_add('2025-02-09', interval 30 day), null, datediff(current_date(), date_add('2025-02-09', interval 30 day))
+);
+
+
+select * from inventory_overdue_notification;
+
+insert into inventory_overdue_notification(LoanID, notification_date)
+values (1, date_add('2025-02-14', interval 1 day)),
+(2, date_add('2025-02-21', interval 1 day)),
+(3, date_add('2025-02-15', interval 1 day)),
+(4, date_add('2025-02-09', interval 1 day)),
+(1, date_add('2025-02-14', interval 8 day)),
+(3, date_add('2025-02-15', interval 8 day)
+);
+
