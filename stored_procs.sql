@@ -64,7 +64,7 @@ END //
 
 DELIMITER ;
 
--- CALLING THE FUNCTION
+-- CALLING THE FUNCTION --
 call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2011-03-16');
 call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
 
@@ -114,6 +114,7 @@ BEGIN
     
 END //
 
+-- CALLING THE FUNCTION --
 call AddNewLoan(2, 14); -- child
 call AddNewLoan(5, 10) -- adult
 
@@ -161,7 +162,7 @@ END//
 
 DELIMITER ;
 
--- CALLING THE FUNCTION
+-- CALLING THE FUNCTION --
 call GetMemberInfo(4);
 
 
@@ -184,6 +185,7 @@ END //
 
 DELIMITER ;
 
+-- CALLING THE FUNCTION --
 call SearchBookByGenre('fiction');
 call SearchBookByGenre('Romance');
 
