@@ -1,4 +1,4 @@
-create database staff;
+use library_3;
 
 use staff;
 

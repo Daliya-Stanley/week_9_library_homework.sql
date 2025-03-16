@@ -1,4 +1,10 @@
-use library;
+use library_3;
+
+select * from book_genre;
+select * from book;
+select * from book_author;
+select * from book_author_classification;
+select * from book_genre_classification;
 
 create table book_genre (
 GenreID int not null primary key auto_increment, 
@@ -12,37 +18,6 @@ first_name varchar(100),
 last_name varchar(150)
 );
 
-
-create table Book (
-BookID int not null primary key auto_increment,
-ISBN varchar(50) not null,
-book_name varchar(300) not null,
-publishing_date date not null);
-
-create table book_author_classification(
-BookID int,
-AuthorID int,
-primary key(BookID, AuthorID)
-);
-
-create table book_genre_classification(
-BookID int,
-GenreID int,
-primary key(BookID, GenreID)
-);
-
-
-create table book_genre (
-GenreID int not null primary key auto_increment, 
-name varchar(100)
-);
-
-
-create table book_author(
-AuthorID int not null primary key auto_increment,
-first_name varchar(100),
-last_name varchar(150)
-);
 
 create table Book (
 BookID int not null primary key auto_increment,
@@ -72,8 +47,10 @@ values("Fiction"),
 ("Politics"),
 ("Thriller"),
 ("Children's Literature");
+
 select *
 from book_genre;
+
 insert into book_author(first_name, last_name)
 values ("Jane" , "Austen"),
 ("Ray","Bradybury"),

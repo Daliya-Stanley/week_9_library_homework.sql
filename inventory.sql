@@ -1,8 +1,12 @@
-use library;
+use library_3;
 
 											-- Inventory Section --
 
 select * from inventory_status;
+select * from inventory_condition;
+select * from inventory;
+select * from inventory_loan;
+select * from inventory_overdue_notification;
 
 create table inventory_status
 (

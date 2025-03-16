@@ -1,6 +1,23 @@
-use library;
+create database library_3;
+use library_3;
 
 -- Member section
+
+create table member_membership_status
+(
+MembershipStatusID int not null primary key auto_increment,
+membership_status varchar(50) not null
+);
+-- used the  row 10-13 table on the google sheet. made the column "age_range_max" null
+create table member_membership_type
+(
+MembershipTypeID int not null primary key auto_increment,
+membership_type varchar(50) not null,
+age_range_min int not null,
+age_range_max int null,
+loan_duration int not null
+);
+
 
 create table member
 (
@@ -25,23 +42,17 @@ foreign key (MemberID) references member(MemberID),
 foreign key (GenreID) references book_genre (GenreID)
 );
 
-create table member_membership_status
-(
-MembershipStatusID int not null primary key auto_increment,
-membership_status varchar(50) not null
-);
--- used the  row 10-13 table on the google sheet. made the column "age_range_max" null
-create table member_membership_type
-(
-MembershipTypeID int not null primary key auto_increment,
-membership_type varchar(50) not null,
-age_range_min int not null,
-age_range_max int null,
-loan_duration int not null
-);
 
 
 -- adding rows to the table
+
+insert into member_membership_Status (membership_status)
+values ('Active'),
+('Cancelled'),('Suspended');
+
+insert into member_membership_type (Membership_type, age_range_min, age_range_max, loan_duration)
+values ('Adult', 18, null, 14),
+('Child', 0, 13, 30), ('Young adult', 14, 17, 14);
 
 insert into member (firstname, lastname, email, birth_date, registration_date, membershipStatusID, MembershipTypeID)
 values ('Miranda', 'Childs', 'Miranda@gmail.com', '1992-05-17', '2020-06-11', 1, 1),
@@ -59,14 +70,6 @@ values ('Miranda', 'Childs', 'Miranda@gmail.com', '1992-05-17', '2020-06-11', 1,
 insert into member_genre_preference (MemberID, GenreID)
 values (1,3),(2,1),(2,8),(3,1),(4,2),(5,4),(5,6),(6,5),(7,2),(8,1),(8,8),(9,7),(9,4),(10,5),(10,7);
 
-
-insert into member_membership_Status (membership_status)
-values ('Active'),
-('Cancelled'),('Suspended');
-
-insert into member_membership_type (Membership_type, age_range_min, age_range_max, loan_duration)
-values ('Adult', 18, null, 14),
-('Child', 0, 13, 30), ('Young adult', 14, 17, 14);
 
 
 select *
