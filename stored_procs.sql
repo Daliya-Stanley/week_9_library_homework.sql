@@ -1,24 +1,25 @@
 use library;
 
 -- Stored procedure: Add a new library member to the member table.
+-- Function: AddNewMember()
 DELIMITER //
 
-create procedure AddNewMember(
-in pFirstname varchar(50),
-in pLastname varchar(100),
-in pEmail varchar(300),
-in pBirthdate date
+CREATE PROCEDURE AddNewMember(
+IN pFirstname varchar(50),
+IN pLastname varchar(100),
+IN pEmail varchar(300),
+IN pBirthdate date
 )
 
 BEGIN
 	DECLARE vAge INT;
     DECLARE vMembershiptype INT;
-    SET vAge = datediff(current_date(), pBirthdate)/365;
-    SELECT MembershipTypeID into vMembershiptype
+    SET vAge = DATEDIFF(CURRENT_DATE(), pBirthdate)/365;
+    SELECT MembershipTypeID INTO vMembershiptype
 	FROM member_membership_type
     WHERE vAge BETWEEN age_range_min AND IFNULL(age_range_max, vAge);
     
-	insert into member(
+	INSERT INTO member(
     firstname,
     lastname,
     email,
@@ -27,12 +28,12 @@ BEGIN
     MembershipStatusID,
     MembershipTypeID
     )
-    values(
+    VALUES(
     pFirstname,
     pLastname,
     pEmail,
     pBirthdate,
-    current_date(),
+    CURRENT_DATE(),
     1,
     vMembershiptype
     );
@@ -58,4 +59,57 @@ DELIMITER ;
 
 call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2011-03-16');
 call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
+
+
+-- Stored procedure: Add a new LoanID for when a library member checks out and borrows a book.
+-- Function: AddNewLoan()
+
+DELIMITER //
+
+CREATE PROCEDURE AddNewLoan(
+    IN pMemberID INT,
+    IN pInventoryID INT
+)
+BEGIN
+    DECLARE vMembershipType INT;
+    DECLARE vLoanDuration INT;
+    DECLARE vDueDate DATE;
+
+    SELECT MembershipTypeID INTO vMembershipType
+    FROM member
+    WHERE MemberID = pMemberID;
+
+    SELECT loan_duration INTO vLoanDuration
+    FROM member_membership_type
+    WHERE MembershipTypeID = vMembershipType;
+
+    SET vDueDate = DATE_ADD(CURRENT_DATE(), INTERVAL vLoanDuration DAY);
+
+    INSERT INTO inventory_loan(
+        MemberID,
+        InventoryID,
+        checkout_date,
+        due_date,
+        return_date,
+        days_overdue
+    )
+    VALUES (
+        pMemberID,
+        pInventoryID,
+        CURRENT_DATE(),
+        vDueDate,
+        NULL,
+        0
+    );
+    
+END //
+
+call AddNewLoan(2, 14); -- child
+call AddNewLoan(5, 10) -- adult
+
+
+
+
+
+
 
