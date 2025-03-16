@@ -73,23 +73,14 @@ values ('Miranda', 'Purple', 'fantaandmiranda@gmail.com', '1424214124', "2020-02
 ('Grant', 'Mitchell', 'govgrant@gmail.com', '4367828141', "2017-10-04")
 ;
 
-update staff set RoleID = 1 where StaffID = 1;
-update staff set RoleID = 1 where StaffID = 2;
-update staff set RoleID = 1 where StaffID = 3;
-update staff set RoleID = 1 where StaffID = 4;
-update staff set RoleID = 1 where StaffID = 5;
+update staff set RoleID = 1 where StaffID BETWEEN 1 AND 5;
 update staff set RoleID = 6 where StaffID = 6;
 update staff set RoleID = 2 where StaffID = 7;
 update staff set RoleID = 3 where StaffID = 8;
 update staff set RoleID = 5 where StaffID = 9;
 update staff set RoleID = 4 where StaffID = 10;
 
-update staff set ShiftID = 1 where StaffID = 1;
-update staff set ShiftID = 1 where StaffID = 2;
-update staff set ShiftID = 1 where StaffID = 3;
-update staff set ShiftID = 1 where StaffID = 4;
-update staff set ShiftID = 1 where StaffID = 5;
-update staff set ShiftID = 1 where StaffID = 6;
+update staff set ShiftID = 1 where StaffID BETWEEN 1 AND 6;
 update staff set ShiftID = 2 where StaffID = 7;
 update staff set ShiftID = 3 where StaffID = 8;
 update staff set ShiftID = 4 where StaffID = 9;
