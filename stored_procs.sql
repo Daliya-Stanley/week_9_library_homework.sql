@@ -1,9 +1,6 @@
 use library_3;
 
--- STORED PROCEDURES --
-
-
--- STORED PROCEDURE 1: Add a new library member to the member table.
+-- STORED PROCEDURE 1: ADD A NEW LIBRARY MEMBER
 -- Function: AddNewMember()
 
 -- INTUITION BEHIND THIS PROCEDURE:
@@ -114,9 +111,9 @@ call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2011-03-16');
 call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
 
 
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
--- STORED PROCEDURE 2: Add a new LoanID for when a library member checks out and borrows a book.
+-- STORED PROCEDURE 2: ADD A NEW LOANID WHEN A LIBRARY MEMBER CHECKS OUT (LOANS) A BOOK
 -- Function: AddNewLoan()
 
 -- INTUITION BEHIND THIS PROCEDURE:
@@ -169,7 +166,7 @@ END //
 call AddNewLoan(2, 14); -- child
 call AddNewLoan(5, 10) -- adult
 
--- TRIGGER: automatically updates the InventoryStatusID column in inventory table to 2.
+-- TRIGGER: AUTOMATICALLY UPDATE THE INVENTORYSTATUSID COLUMN IN INVENTORY TABLE TO 2 = LOANED
 
 -- INTUITION BEHIND THE TRIGGER: 
 -- When a Library member checks out a book to loan (borrow), a Librarian may want to record this new loan on the database. 
@@ -218,25 +215,71 @@ DELIMITER ;
 
 
 
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
--- STORED PROCEDURE 3: View overdue books
+-- STORED PROCEDURE 3.1: CHECK OVERDUE BOOKS ONLY
+-- Function: CheckOverdueBooks()
 DELIMITER //
 
 CREATE PROCEDURE CheckOverdueBooks()
 
 BEGIN
-
 	SELECT
-		
-
+		l.loanid as 'Loan Number',
+		i.inventoryid as 'Inventory Number',
+		b.book_name as 'Book Name',
+        l.memberid as 'Member Number',
+        m.firstname as 'Member First Name',
+        m.lastname as 'Member Surname',
+        l.checkout_date as 'Checkout Date',
+        l.days_overdue as 'Days Overdue'
+	FROM inventory_loan as l
+    INNER JOIN inventory as i ON i.inventoryid = l.inventoryid
+    INNER JOIN book as b ON i.bookid = b.bookid
+    INNER JOIN member as m ON m.memberid = l.memberid
+    where l.days_overdue > 0; -- only display overdue books.
 
 END //
 
 DELIMITER ;
 
+-- CALLING THE PROCEDURE --
+call CheckOverdueBooks();
 
 
+
+-- STORED PROCEDURE 3.2: CHECK FULL LIST OF BORROWED BOOKS
+-- Function: CheckBorrowedBooks()
+DELIMITER //
+
+CREATE PROCEDURE CheckBorrowedBooks()
+
+BEGIN
+	SELECT
+		l.loanid as 'Loan Number',
+		i.inventoryid as 'Inventory Number',
+		b.book_name as 'Book Name',
+        l.memberid as 'Member Number',
+        m.firstname as 'Member First Name',
+        m.lastname as 'Member Surname',
+        l.checkout_date as 'Checkout Date',
+        l.days_overdue as 'Days Overdue'
+	FROM inventory_loan as l
+    INNER JOIN inventory as i ON i.inventoryid = l.inventoryid
+    INNER JOIN book as b ON i.bookid = b.bookid
+    INNER JOIN member as m ON m.memberid = l.memberid;
+
+END //
+
+DELIMITER ;
+
+-- CALLING THE PROCEDURE --
+call CheckBorrowedBooks()
+
+
+
+
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- STORED PROCEDURE 4: Get Member Information
@@ -265,6 +308,8 @@ DELIMITER ;
 -- CALLING THE PROCEDURE --
 call GetMemberInfo(4);
 
+
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- STORED PROCEDURE 5: Search book name by genre name.
