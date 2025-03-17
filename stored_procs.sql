@@ -1,6 +1,6 @@
 use library_3;
 
--- STORED PROCEDURE 1: ADD A NEW LIBRARY MEMBER
+-- STORED PROCEDURE 1.1: ADD A NEW LIBRARY MEMBER
 -- Function: AddNewMember()
 
 -- INTUITION BEHIND THIS PROCEDURE:
@@ -109,6 +109,12 @@ DELIMITER ;
 -- CALLING THE PROCEDURE --
 call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2011-03-16');
 call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
+
+
+
+-- PROCEDURE 1.2: CANCEL MEMBERSHIP
+
+
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
