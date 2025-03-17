@@ -61,27 +61,14 @@ foreign key (ShiftID) references Staff_working_hours(ShiftID)
 );
 
 insert into staff(firstname, lastname, email, phone_number, start_date)
-values ('Miranda', 'Purple', 'fantaandmiranda@gmail.com', '1424214124', "2020-02-01"),
-('Titi', 'Green', 'glassoftitea@gmail.com', '9986273928', "1999-10-09"),
-('Nadine', 'Red', 'nadinesardine@gmail.com', '2673528288', "2021-11-13"),
-('Daliya', 'Yellow', 'daliyatheflower@gmail.com', '6732946863', "2019-09-16"),
-('Reanna', 'Blue', 'therealrehanna@gmail.com', '3584154421', "2019-01-10"),
-('Victoria', 'Smith', 'queenv@gmail.com', '4287948267', "2021-10-10"),
-('Roahl', 'Dahl', 'readmybooks@gmail.com', '5621854475', "2017-04-02"),
-('Julia', 'Donaldson', 'juliefromtheblock@gmail.com', '4367944164', "2017-09-04"),
-('Phil', 'Mitchell', 'phillycheesesteak@gmail.com', '4125332323', "2017-10-04"),
-('Grant', 'Mitchell', 'govgrant@gmail.com', '4367828141', "2017-10-04")
+values ('Miranda', 'Purple', 'fantaandmiranda@gmail.com', '1424214124', "2020-02-01", 1, 1),
+('Titi', 'Green', 'glassoftitea@gmail.com', '9986273928', "1999-10-09", 1, 1),
+('Nadine', 'Red', 'nadinesardine@gmail.com', '2673528288', "2021-11-13", 1, 1),
+('Daliya', 'Yellow', 'daliyatheflower@gmail.com', '6732946863', "2019-09-16", 1, 1),
+('Reanna', 'Blue', 'therealrehanna@gmail.com', '3584154421', "2019-01-10", 1, 1),
+('Victoria', 'Smith', 'queenv@gmail.com', '4287948267', "2021-10-10", 6, 1),
+('Roahl', 'Dahl', 'readmybooks@gmail.com', '5621854475', "2017-04-02", 2, 2),
+('Julia', 'Donaldson', 'juliefromtheblock@gmail.com', '4367944164', "2017-09-04", 3, 3),
+('Phil', 'Mitchell', 'phillycheesesteak@gmail.com', '4125332323', "2017-10-04",5, 4),
+('Grant', 'Mitchell', 'govgrant@gmail.com', '4367828141', "2017-10-04", 4, 5)
 ;
-
-update staff set RoleID = 1 where StaffID BETWEEN 1 AND 5;
-update staff set RoleID = 6 where StaffID = 6;
-update staff set RoleID = 2 where StaffID = 7;
-update staff set RoleID = 3 where StaffID = 8;
-update staff set RoleID = 5 where StaffID = 9;
-update staff set RoleID = 4 where StaffID = 10;
-
-update staff set ShiftID = 1 where StaffID BETWEEN 1 AND 6;
-update staff set ShiftID = 2 where StaffID = 7;
-update staff set ShiftID = 3 where StaffID = 8;
-update staff set ShiftID = 4 where StaffID = 9;
-update staff set ShiftID = 5 where StaffID = 10;
