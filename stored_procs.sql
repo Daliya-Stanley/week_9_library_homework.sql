@@ -229,8 +229,7 @@ BEGIN
 		i.inventoryid as 'Inventory Number',
 		b.book_name as 'Book Name',
         l.memberid as 'Member Number',
-        m.firstname as 'Member First Name',
-        m.lastname as 'Member Surname',
+        CONCAT(m.firstname, ' ', m.lastname) as 'Member Name',
         l.checkout_date as 'Checkout Date',
         l.days_overdue as 'Days Overdue'
 	FROM inventory_loan as l
