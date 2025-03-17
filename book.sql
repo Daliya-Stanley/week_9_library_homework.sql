@@ -14,8 +14,8 @@ name varchar(100)
 
 create table book_author(
 AuthorID int not null primary key auto_increment,
-first_name varchar(100),
-last_name varchar(150)
+firstname varchar(100),
+lastname varchar(150)
 );
 
 
