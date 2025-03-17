@@ -1,7 +1,12 @@
-create database library_3;
-use library_3;
+use library_5;
 
 -- Member section
+
+select * from member_membership_type;
+select * from member_membership_status;
+select * from member;
+
+select * from member_genre_preference;
 
 create table member_membership_status
 (
@@ -84,18 +89,3 @@ values ('Miranda', 'Childs', 'Miranda@gmail.com', '1992-05-17', '2020-06-11', 1,
 
 insert into member_genre_preference (MemberID, GenreID)
 values (1,3),(2,1),(2,8),(3,1),(4,2),(5,4),(5,6),(6,5),(7,2),(8,1),(8,8),(9,7),(9,4),(10,5),(10,7);
-
-
-
-select *
-from member_membership_type;
-
-select *
-from member_membership_status;
-
-select *
-from member;
-
-select *
-from member_genre_preference;
-

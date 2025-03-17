@@ -1,15 +1,8 @@
-use library_3;
+use library_5;
 
-use staff;
-
-select *
-from staff_working_hours;
-
-select *
-from staff_role;
-
-select *
-from staff;
+select * from staff_working_hours;
+select * from staff_role;
+select * from staff;
 
 create table staff_working_hours
 (
@@ -60,7 +53,7 @@ foreign key (RoleID) references staff_role(RoleID),
 foreign key (ShiftID) references Staff_working_hours(ShiftID) 
 );
 
-insert into staff(firstname, lastname, email, phone_number, start_date)
+insert into staff(firstname, lastname, email, phone_number, start_date, roleid, shiftid)
 values ('Miranda', 'Purple', 'fantaandmiranda@gmail.com', '1424214124', "2020-02-01", 1, 1),
 ('Titi', 'Green', 'glassoftitea@gmail.com', '9986273928', "1999-10-09", 1, 1),
 ('Nadine', 'Red', 'nadinesardine@gmail.com', '2673528288', "2021-11-13", 1, 1),

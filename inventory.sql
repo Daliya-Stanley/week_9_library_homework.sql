@@ -1,4 +1,4 @@
-use library_3;
+use library_5;
 
 											-- Inventory Section --
 
@@ -15,16 +15,12 @@ status varchar(100) not null
 );
 
 
-select * from inventory_condition;
-
 create table inventory_condition
 (
 ConditionID int not null primary key auto_increment,
 status varchar(100) not null
 );
 
-
-select * from inventory;
 
 create table inventory
 (
@@ -38,7 +34,6 @@ foreign key (ConditionID) references inventory_condition(ConditionID)
 );
 
 
-select * from inventory_loan;
 
 create table inventory_loan
 (
@@ -54,7 +49,6 @@ foreign key (InventoryID) references inventory(InventoryID)
 );
 
 
-select * from inventory_overdue_notification;
 
 create table inventory_overdue_notification(
 NotificationID int not null primary key auto_increment,
@@ -64,8 +58,6 @@ foreign key (LoanID) references inventory_loan(LoanID)
 );
 
 
-select * from inventory_status;
-
 insert into inventory_status(status)
 values ('In stock'),
 ('Loaned'),
@@ -73,16 +65,12 @@ values ('In stock'),
 ('Reserved');
 
 
-select * from inventory_condition;
-
 insert into inventory_condition(status)
 values ('Excellent'),
 ('Good'),
 ('Damaged'),
 ('Replacement needed');
 
-
-select * from inventory;
 
 insert into inventory(BookID, InventoryStatusID, ConditionID)
 values (1, 1, 1),
@@ -117,8 +105,6 @@ values (1, 1, 1),
 (15, 1, 2);
 
 
-select * from inventory_loan;
-
 insert into inventory_loan(MemberID, InventoryID, checkout_date, due_date, return_date, days_overdue)
 values (1, 5, '2025-02-14', date_add('2025-02-14', interval 14 day), null, datediff(current_date(), date_add('2025-02-14', interval 14 day))),
 (4, 15, '2025-02-21', date_add('2025-02-21', interval 14 day), null, datediff(current_date(), date_add('2025-02-21', interval 14 day))),
@@ -126,8 +112,6 @@ values (1, 5, '2025-02-14', date_add('2025-02-14', interval 14 day), null, dated
 (2, 29, '2025-02-09', date_add('2025-02-09', interval 30 day), null, datediff(current_date(), date_add('2025-02-09', interval 30 day))
 );
 
-
-select * from inventory_overdue_notification;
 
 insert into inventory_overdue_notification(LoanID, notification_date)
 values (1, date_add('2025-02-14', interval 1 day)),

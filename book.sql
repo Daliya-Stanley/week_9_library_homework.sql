@@ -1,4 +1,4 @@
-use library_3;
+use library_5;
 
 select * from book_genre;
 select * from book;
@@ -48,10 +48,8 @@ values("Fiction"),
 ("Thriller"),
 ("Children's Literature");
 
-select *
-from book_genre;
 
-insert into book_author(first_name, last_name)
+insert into book_author(firstname, lastname)
 values ("Jane" , "Austen"),
 ("Ray","Bradybury"),
 ("Dan","Brown"),
@@ -69,8 +67,6 @@ values ("Jane" , "Austen"),
 ("Alice","Walker");
 
 
-select *
-from book_author;
 insert into Book (ISBN, book_name, publishing_date)
 values("9780451524935","1984", "1949-06-08"),
 ("9780743273565", "The Great Gatsby", "1925-04-10"),
@@ -108,8 +104,6 @@ values(1, 11),
 (14,5),
 (15,15);
 
-select *
-from book_author_classification;
 
 insert book_genre_classification(BookID, GenreID)
 values(1, 1),

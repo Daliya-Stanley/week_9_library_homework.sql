@@ -1,4 +1,4 @@
-use library_3;
+USE library_5;
 
 -- Counts the number of members in each membership status
 SELECT mts.membership_status, COUNT(m.MemberID) AS 'Member Count'
