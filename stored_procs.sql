@@ -114,9 +114,37 @@ call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
 
 -- PROCEDURE 1.2: CANCEL MEMBERSHIP
 
+DELIMITER //
+CREATE PROCEDURE pCancelMember(IN pMemberID INT)
+BEGIN
+    UPDATE member
+    SET MembershipStatusID = 2
+    WHERE MemberID = pMemberID;
+    
+END //
 
+DELIMITER ;
 
+call pCancelMember(2);
+select * from member;
 
+-- EVENT: REMOVE ROW OF CANCELLED MEMBERSHIP
+select * from member;
+
+DELIMITER //
+CREATE EVENT eRemoveCancelledMembers 
+ON SCHEDULE EVERY 1 SECOND
+STARTS CURRENT_TIMESTAMP() + INTERVAL 10 SECOND
+	DO
+		DELETE FROM member WHERE MembershipStatusID = 2;
+END //
+
+DELIMITER ;
+
+call eRemoveCancelledMembers;
+
+update member
+set MembershipStatusID = 1 where memberid = 1;
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- STORED PROCEDURE 2: ADD A NEW LOANID WHEN A LIBRARY MEMBER CHECKS OUT (LOANS) A BOOK
@@ -171,6 +199,10 @@ END //
 -- CALLING THE PROCEDURE --
 call AddNewLoan(2, 14); -- child
 call AddNewLoan(5, 10) -- adult
+
+
+SELECT * from inventory_loan;
+SELECT * from inventory;
 
 -- TRIGGER: AUTOMATICALLY UPDATE THE INVENTORYSTATUSID COLUMN IN INVENTORY TABLE TO 2 = LOANED
 
@@ -310,7 +342,7 @@ END//
 DELIMITER ;
 
 -- CALLING THE PROCEDURE --
-call GetMemberInfo(4);
+call GetMemberInfo(2);
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -320,11 +352,11 @@ call GetMemberInfo(4);
 -- Function: SearchBookByGenre()
 
 DELIMITER //
-CREATE PROCEDURE SearchBookByGenre(IN pname varchar(300))
+CREATE PROCEDURE SearchBookByGenre2(IN pname varchar(300))
 BEGIN
 	SELECT
 		g.name as 'Genre',
-		b.name as 'Name of Book'
+		b.book_name as 'Name of Book'
 	FROM book_genre_classification as bg
     INNER JOIN book_genre as g ON bg.GenreID = g.GenreID
     INNER JOIN book as b ON bg.BookID = b.BookID
@@ -335,8 +367,8 @@ END //
 DELIMITER ;
 
 -- CALLING THE PROCEDURE --
-call SearchBookByGenre('fiction');
-call SearchBookByGenre('Romance');
+call SearchBookByGenre2('fiction');
+call SearchBookByGenre2('Romance');
 
 
 
