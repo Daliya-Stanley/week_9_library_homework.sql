@@ -43,6 +43,21 @@ foreign key (GenreID) references book_genre (GenreID)
 );
 
 
+create table member_cancelled
+(
+MemberID int not null primary key auto_increment,
+firstname varchar(50) not null,
+lastname varchar(100) not null,
+email varchar(100) not null,
+birth_date date not null,
+registration_date date not null,
+MembershipStatusID int,
+MembershipTypeID int,
+foreign key (MembershipStatusID) references member_membership_status(MembershipStatusID),
+foreign key (MembershipTypeID) references member_membership_type(MembershipTypeID)
+);
+
+
 
 -- adding rows to the table
 
@@ -61,10 +76,10 @@ values ('Miranda', 'Childs', 'Miranda@gmail.com', '1992-05-17', '2020-06-11', 1,
 ('Reanna', 'Gibson', 'Reanna@gmail.com', '1996-07-19', '2022-09-19', 1, 1),
 ('Nadine', 'Latifah','Nadine@gmail.com', '2001-06-04', '2014-07-30', 1, 1),
 ('Michael', 'Apple', 'Michael@gmail.com', '1970-08-18', '2011-01-01', 3, 1),
-('David', 'Pear', 'David@gmail.com', '2009-02-14', '2015-11-02', 2, 3),
+('David', 'Pear', 'David@gmail.com', '2009-02-14', '2015-11-02', 1, 3),
 ('Allan', 'Orange', 'Allan@gmail.com', '2019-02-27', '2019-03-28', 1, 2),
 ('Edgar', 'Peach', 'Edgar@gmail.com', '2010-12-05', '2003-06-15', 3, 3),
-('Ronald', 'Banana', 'Ronald@gmail.com', '1995-12-25', '2016-02-08', 2, 1)
+('Ronald', 'Banana', 'Ronald@gmail.com', '1995-12-25', '2016-02-08', 1, 1)
 ;
 
 insert into member_genre_preference (MemberID, GenreID)

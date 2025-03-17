@@ -78,7 +78,8 @@ GROUP BY r.role_name, wh.start_time, wh.end_time;
 --        mts.membership_status AS 'Membership Status', mtt.membership_type AS 'Membership Type'
 -- FROM member m
 -- INNER JOIN member_membership_type mtt ON m.MembershipTypeID = mtt.MembershipTypeID
--- INNER JOIN member_membership_status mts ON m.MembershipStatusID = mts.MembershipStatusID;
+-- INNER JOIN member_membership_status mts ON m.MembershipStatusID = mts.MembershipStatusID
+-- group by m.Memberid;
 
 
 -- Find members with a specific membership type (this example is adult)
