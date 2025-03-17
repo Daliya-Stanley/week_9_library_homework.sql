@@ -68,7 +68,9 @@ call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 -- PROCEDURE 1.2: CANCEL MEMBERSHIP
+-- Procedure: CancelMember()
 
 DELIMITER //
 CREATE PROCEDURE CancelMember(IN pMemberID INT)
