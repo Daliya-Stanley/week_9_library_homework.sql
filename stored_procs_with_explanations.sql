@@ -436,3 +436,23 @@ BEGIN
     
 END //
 DELIMITER ;
+
+
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- STORED PROCEDURE 6: ADD GENRE 
+DELIMITER //
+CREATE PROCEDURE AddGenre(IN pBookID int, IN pGenrename varchar(100))
+BEGIN
+	DECLARE vgenreid int;
+    
+    SELECT GenreID into vgenreid from book_genre where name = pGenrename;
+    
+	INSERT INTO book_genre_classification(bookid, genreid)
+    VALUES (pBookID, vgenreid);
+END//
+DELIMITER ;
+
+call AddGenre();
+
