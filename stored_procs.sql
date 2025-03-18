@@ -407,4 +407,23 @@ INNER JOIN book_genre bg ON bgc.GenreID = bg.GenreID
 GROUP BY b.BookID;
 
 
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- STORED PROCEDURE 7: 
+DELIMITER //
+CREATE PROCEDURE findbookbyauthor(IN pfirstname varchar(150))
+BEGIN
+	SELECT
+		ba.firstname AS 'Author Name',
+        b.book_name AS 'Name of the book'
+	FROM book_author as ba
+    INNER JOIN book_author_classification as bac ON ba.AuthorID = bac.AuthorID
+    INNER JOIN book as b ON b.BookID = bac.BookID
+    where ba.firstname = pfirstname;
+    
+END//
+DELIMITER ;
+
+call findbookbyauthor('Ray');
 
