@@ -90,11 +90,10 @@ BEGIN -- begin the procedure.
     
 -- SELECT statement selects the columns and values we want to see when this procedure is called --
     SELECT
-		m.firstname as 'Name',
-        m.lastname as 'Surname',
+		CONCAT(m.firstname, ' ', m.lastname) as 'Member Name',
         m.email as 'Email Address',
-        m.birth_date as 'Date of Birth',
-        m.registration_date as 'Registration Date',
+        DATE_FORMAT(m.birth_date, '%d %M %Y') as 'Date of Birth',
+        DATE_FORMAT(m.registration_date, '%d %M %Y') as 'Registration Date',
         s.membership_status as 'Membership Status',
         t.membership_type as 'Membership Type'
     FROM member as m 
@@ -110,8 +109,9 @@ DELIMITER ;
 -- CALLING THE PROCEDURE --
 call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2011-03-16');
 call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
-
-
+call AddNewMember('Peppa', 'Pig', 'missbacon@gmail.com', '2018-11-28');
+call AddNewMember('Spongebob', 'SquarePants', 'ss@gkrustykrab.com', '1992-10-17');
+call AddNewMember('Patrick', 'Star', 'starfishin@bikinibottom.com', '1992-06-21');
 
 -- PROCEDURE 1.2: CANCEL MEMBERSHIP
 
@@ -121,18 +121,16 @@ BEGIN
     UPDATE member
     SET MembershipStatusID = 2
     WHERE MemberID = pMemberID;
-    
+	
 END //
 
 DELIMITER ;
 
-call CancelMember(21);
+call CancelMember(19);
 
-update member set membershipstatusid = 1 where memberid = 21;
-update member set membershipstatusid = 1 where memberid = 22;
 select * from member;
 DELETE FROM member WHERE MembershipStatusID = 2;
-select * from member_cancelled;
+select * from member_cancelled order by memberid;
 
 -- EVENT 1: TRANSFER ROW DATA TO member_cancelled TABLE
 -- ensure event scheduler is ON --
@@ -140,31 +138,29 @@ SET GLOBAL event_scheduler = ON;
 
 DELIMITER //
 CREATE EVENT eTransferCancelledMembers 
-ON SCHEDULE EVERY 1 MINUTE
-STARTS DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 5 SECOND)
+ON SCHEDULE EVERY 1 SECOND
+STARTS DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 4 SECOND)
+ENDS DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 5 SECOND)
 DO
 BEGIN
-INSERT INTO member_cancelled(memberid, firstname, lastname, email, birth_date, registration_date, membershipstatusid, membershiptypeid)
-SELECT memberid, firstname, lastname, email, birth_date, registration_date, membershipstatusid, membershiptypeid
-FROM member
-WHERE MembershipStatusID = 2;
+    INSERT INTO member_cancelled(memberid, firstname, lastname, email, birth_date, registration_date, cancellation_date, membershipstatusid, membershiptypeid)
+    SELECT memberid, firstname, lastname, email, birth_date, registration_date, CURRENT_DATE(), membershipstatusid, membershiptypeid
+    FROM member
+    WHERE MembershipStatusID = 2;
 END //
-
 DELIMITER ;
 
--- EVENT 2: REMOVE ROW OF MEMBERS WHO HAVE CANCELLED THEIR MEMBERSHIP FROM member TABLE
-
+-- Event 2: Remove Cancelled Members from member table
 DELIMITER //
 CREATE EVENT eRemoveCancelledMembers 
-ON SCHEDULE EVERY 1 MINUTE
-STARTS DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 6 SECOND)
+ON SCHEDULE EVERY 1 SECOND 
+STARTS DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 6 SECOND)
 DO
 BEGIN
-DELETE FROM member WHERE MembershipStatusID = 2;
+    DELETE FROM member WHERE MembershipStatusID = 2;
 END //
-
-
 DELIMITER ;
+
 show events;
 drop event if exists eRemoveCancelledMembers;
 drop event if exists eTransferCancelledMembers;

@@ -50,12 +50,13 @@ foreign key (GenreID) references book_genre (GenreID)
 
 create table member_cancelled
 (
-MemberID int not null primary key auto_increment,
+MemberID int,
 firstname varchar(50) not null,
 lastname varchar(100) not null,
 email varchar(100) not null,
 birth_date date not null,
 registration_date date not null,
+cancellation_date date,
 MembershipStatusID int,
 MembershipTypeID int,
 foreign key (MembershipStatusID) references member_membership_status(MembershipStatusID),

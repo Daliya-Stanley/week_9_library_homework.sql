@@ -1,5 +1,6 @@
 -- IF YOU WOULD LIKE TO RUN ANY PROCEDURE PLEASE USE LIBRARY_3 DATABASE --
-USE library_3;
+USE library_5;
+
 
 -- STORED PROCEDURE 1: ADD A NEW LIBRARY MEMBER
 -- Procedure: AddNewMember()
@@ -43,19 +44,18 @@ BEGIN
     vMembershiptype -- int value stored in variable.
     );
     
--- SELECT statement selects the columns and values the librarian wants displayed when this procedure is called --
+	-- SELECT statement selects the columns and values the librarian wants displayed when this procedure is called --
     SELECT
-		m.firstname as 'Name',
-        m.lastname as 'Surname',
+		CONCAT(m.firstname, ' ', m.lastname) as 'Member Name',
         m.email as 'Email Address',
-        m.birth_date as 'Date of Birth',
-        m.registration_date as 'Registration Date',
+        DATE_FORMAT(m.birth_date, '%d %M %Y') as 'Date of Birth',
+        DATE_FORMAT(m.registration_date, '%d %M %Y') as 'Registration Date',
         s.membership_status as 'Membership Status',
         t.membership_type as 'Membership Type'
     FROM member as m 
     INNER JOIN member_membership_status as s ON m.MembershipStatusID = s.MembershipStatusID -- multi-table join 
     INNER JOIN member_membership_type as t ON m.MembershipTypeID = t.MembershipTypeID -- instead of displaying ID numbers, display the actual membership status and type names.
-    order by m.MemberID -- order by the MemberID
+    order by m.registration_date -- order by the registration date
     ;
 
 END // -- End the procedure.
@@ -63,14 +63,17 @@ END // -- End the procedure.
 DELIMITER ;
 
 -- CALLING THE PROCEDURE --
-call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2011-03-16');
-call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2001-03-16');
+call AddNewMember('Brandy', 'Harrington', 'isadog@gmail.com', '2001-04-30');
+call AddNewMember('Mister', 'Whiskers', 'isacat@gmail.com', '2021-03-19');
+call AddNewMember('Peppa', 'Pig', 'missbacon@gmail.com', '2018-11-28');
+call AddNewMember('Spongebob', 'SquarePants', 'ss@gkrustykrab.com', '1992-10-17');
+call AddNewMember('Patrick', 'Star', 'starfishin@bikinibottom.com', '1992-06-21');
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
--- PROCEDURE 1.2: CANCEL MEMBERSHIP
+-- PROCEDURE 2: CANCEL MEMBERSHIP
 -- Procedure: CancelMember()
 
 DELIMITER //
@@ -80,41 +83,62 @@ BEGIN
     SET MembershipStatusID = 2
     WHERE MemberID = pMemberID;
     
+    SELECT
+		m.memberid as 'Member ID',
+        CONCAT(m.firstname, ' ', m.lastname) as 'Member Name',
+        m.email as 'Email Address',
+        DATE_FORMAT(m.birth_date, '%d %M %Y') as 'Date of Birth',
+        DATE_FORMAT(m.registration_date, '%d %M %Y') as 'Registration Date',
+        s.membership_status as 'Membership Status',
+        t.membership_type as 'Membership Type'
+	FROM member as m INNER JOIN member_membership_status as s ON s.membershipstatusid = m.membershipstatusid
+    INNER JOIN member_membership_type as t ON m.membershiptypeid = t.membershiptypeid
+    order by m.registration_date;
+    
 END //
 
 DELIMITER ;
 
-call CancelMember(21);
+call CancelMember(1);
 
--- TRIGGER: TRANSFER ROW DATA TO member_cancelled TABLE
+
+-- TRIGGER: TRANSFER ROW DATA TO member_cancelled TABLE -- run this first!
 DELIMITER //
 CREATE TRIGGER TransferCancelledMembers
 AFTER UPDATE ON member
 FOR EACH ROW
 BEGIN
     IF NEW.membershipstatusid = 2 THEN
-        INSERT INTO member_cancelled (memberid, firstname, lastname, email, birth_date, registration_date, membershipstatusid, membershiptypeid)
-        VALUES (NEW.memberid, NEW.firstname, NEW.lastname, NEW.email, NEW.birth_date, NEW.registration_date, NEW.membershipstatusid, NEW.membershiptypeid);
+        INSERT INTO member_cancelled (memberid, firstname, lastname, email, birth_date, registration_date, cancellation_date, membershipstatusid, membershiptypeid)
+        VALUES (NEW.memberid, NEW.firstname, NEW.lastname, NEW.email, NEW.birth_date, NEW.registration_date, current_date(), NEW.membershipstatusid, NEW.membershiptypeid);
     END IF;
 END //
 DELIMITER ;
 
 
--- display results --
-SELECT m.MemberID as 'Member ID', 
-       CONCAT(m.firstname, ' ', m.lastname) as 'Full Name', 
-       s.membership_status AS 'Membership Status', 
-       m.membershipstatusid as 'Membership Status ID'
-FROM member AS m
-INNER JOIN member_membership_status AS s ON m.MembershipStatusID = s.MembershipStatusID
-WHERE m.membershipstatusid = 2
-GROUP BY m.memberid;
+-- VIEW: MEMBER_CANCELLATION TABLE --
+CREATE VIEW ViewCancelledMembers AS
+SELECT
+	mc.memberid as 'Member ID',
+	mc.firstname as 'First Name', 
+    mc.lastname as 'Surname',
+	mc.email as 'Email Address',
+	DATE_FORMAT(mc.birth_date, '%d %M %Y') as 'Date of Birth',
+	DATE_FORMAT(mc.registration_date, '%d %M %Y') as 'Registration Date',
+	DATE_FORMAT(mc.cancellation_date, '%d %M %Y') as 'Cancellation Date',
+	s.membership_status as 'Membership Status',
+	t.membership_type as 'Membership Type'
+FROM member_cancelled as mc INNER JOIN member_membership_status as s ON s.membershipstatusid = mc.membershipstatusid
+INNER JOIN member_membership_type as t ON mc.membershiptypeid = t.membershiptypeid
+order by mc.registration_date;
 
-SELECT * FROM member_cancelled;
+select * from viewcancelledmembers;
+
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- STORED PROCEDURE 2: ADD A NEW LOANID WHEN A LIBRARY MEMBER CHECKS OUT (LOANS) A BOOK
+
+-- STORED PROCEDURE 2: ADD A NEW LOAN ID WHEN A LIBRARY MEMBER CHECKS OUT (LOANS) A BOOK
 -- Procedure: AddNewLoan()
 
 DELIMITER //
@@ -162,7 +186,7 @@ call AddNewLoan(2, 14); -- child
 call AddNewLoan(5, 10) -- adult
 
 
--- TRIGGER: 
+-- TRIGGER: UPDATE INVENTORYSTATUSID = 2 (LOANED) FOR INVENTORY TABLE --
 DELIMITER //
 CREATE TRIGGER UpdateInventoryStatus
 AFTER INSERT ON inventory_loan
@@ -173,69 +197,73 @@ BEGIN
     WHERE InventoryID = NEW.InventoryID;
 
 END //
+DELIMITER ;
 
+-- EVENT: UPDATE DAYS_OVERDUE BY + 1 EVERY DAY FOR ALL THE UNRETURNED BOOKS --
+DELIMITER //
+CREATE EVENT UpdateDaysOverdue
+ON SCHEDULE EVERY 1 DAY
+DO
+BEGIN
+    UPDATE inventory_loan
+    SET days_overdue = days_overdue + 1  -- increment days overdue by 1 each day
+    WHERE return_date IS NULL AND due_date < CURRENT_DATE();
+END //
 DELIMITER ;
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- STORED PROCEDURE 3.1: CHECK OVERDUE BOOKS ONLY
--- Procedure: CheckOverdueBooks()
 
-DELIMITER //
-CREATE PROCEDURE CheckOverdueBooks()
-BEGIN
-	SELECT
-		l.loanid as 'Loan Number',
-		i.inventoryid as 'Inventory Number',
-		b.book_name as 'Book Name',
-        l.memberid as 'Member Number',
-        CONCAT(m.firstname, ' ', m.lastname) as 'Member Name',
-        l.checkout_date as 'Checkout Date',
-        l.days_overdue as 'Days Overdue'
-	FROM inventory_loan as l
-    INNER JOIN inventory as i ON i.inventoryid = l.inventoryid
-    INNER JOIN book as b ON i.bookid = b.bookid
-    INNER JOIN member as m ON m.memberid = l.memberid
-    where l.days_overdue > 0; -- only display overdue books.
+-- VIEW: OVERDUE BOOKS ONLY
+-- VIEW: ViewOverdueBooks
 
-END //
-
-DELIMITER ;
-
--- CALLING THE PROCEDURE --
-call CheckOverdueBooks();
+CREATE VIEW ViewOverdueBooks AS
+SELECT
+	i.inventoryid as 'Inventory ID',
+	b.book_name as 'Book Title',
+	CONCAT(m.firstname, ' ', m.lastname) as 'Borrower Name',
+	l.memberid as 'Borrower ID',
+	DATE_FORMAT(l.checkout_date, '%d %M %Y') as 'Checkout Date',
+	DATE_FORMAT(l.due_date, '%d %M %Y') as 'Due Date',
+	l.days_overdue as 'Days Overdue'
+FROM inventory_loan as l
+INNER JOIN inventory as i ON i.inventoryid = l.inventoryid
+INNER JOIN book as b ON i.bookid = b.bookid
+INNER JOIN member as m ON m.memberid = l.memberid
+where l.days_overdue > 0; -- only display overdue books.
 
 
--- STORED PROCEDURE 3.2: CHECK FULL LIST OF BORROWED BOOKS
--- Function: CheckBorrowedBooks()
-DELIMITER //
-CREATE PROCEDURE CheckBorrowedBooks()
-BEGIN
-	SELECT
-		l.loanid as 'Loan Number',
-		i.inventoryid as 'Inventory Number',
-		b.book_name as 'Book Name',
-        l.memberid as 'Member Number',
-        CONCAT(m.firstname, ' ', m.lastname) as 'Member Name',
-        l.checkout_date as 'Checkout Date',
-        l.days_overdue as 'Days Overdue'
-	FROM inventory_loan as l
-    INNER JOIN inventory as i ON i.inventoryid = l.inventoryid
-    INNER JOIN book as b ON i.bookid = b.bookid
-    INNER JOIN member as m ON m.memberid = l.memberid;
+-- SELECT VIEW --
+SELECT * FROM ViewOverdueBooks;
 
-END //
-DELIMITER ;
 
--- CALLING THE PROCEDURE --
-call CheckBorrowedBooks()
+
+-- VIEW: FULL LIST OF BORROWED BOOKS
+-- view: ViewBorrowedBooks()
+CREATE VIEW ViewBorrowedBooks AS
+SELECT
+	i.inventoryid as 'Inventory ID',
+	b.book_name as 'Book Title',
+	CONCAT(m.firstname, ' ', m.lastname) as 'Borrower Name',
+	l.memberid as 'Borrower ID',
+	DATE_FORMAT(l.checkout_date, '%d %M %Y') as 'Checkout Date',
+	DATE_FORMAT(l.due_date, '%d %M %Y') as 'Due Date',
+	l.days_overdue as 'Days Overdue'
+FROM inventory_loan as l
+INNER JOIN inventory as i ON i.inventoryid = l.inventoryid
+INNER JOIN book as b ON i.bookid = b.bookid
+INNER JOIN member as m ON m.memberid = l.memberid;
+
+
+-- SELECT VIEW --
+SELECT * FROM viewborrowedbooks;
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
--- STORED PROCEDURE 4: Get Member Information
+-- STORED PROCEDURE 3: Get Member Information
 -- Procedure: GetMemberInfo()
 
 DELIMITER //
@@ -245,48 +273,51 @@ BEGIN
 		m.firstname as 'Name',
         m.lastname as 'Surname',
         m.email as 'Email Address',
-        m.birth_date as 'Date of Birth',
-        m.registration_date as 'Registration Date',
+        DATE_FORMAT(m.birth_date, '%d %M %Y') as 'Date of Birth',
+        DATE_FORMAT(m.registration_date, '%d %M %Y') as 'Registration Date',
         s.membership_status as 'Membership Status',
-        t.membership_type as 'Membership Type'
+        t.membership_type as 'Membership Type',
+        GROUP_CONCAT(g.name) as 'Favourite Genres'
     FROM member as m 
     INNER JOIN member_membership_status as s ON m.MembershipStatusID = s.MembershipStatusID
     INNER JOIN member_membership_type as t ON m.MembershipTypeID = t.MembershipTypeID
-    where MemberID = pMemberID;
+    INNER JOIN member_genre_preference as mg ON m.MemberID = mg.MemberID
+    INNER JOIN book_genre as g ON mg.genreid = g.genreid
+    where m.MemberID = pMemberID
+    group by m.MemberID;
 
 END//
-
 DELIMITER ;
 
 -- CALLING THE PROCEDURE --
-call GetMemberInfo(2);
+call GetMemberInfo(1);
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
--- STORED PROCEDURE 5: Search book name by genre name.
+-- STORED PROCEDURE 4: Search Book by inputting Genre Name.
 -- Procedure: SearchBookByGenre()
 
 DELIMITER //
-CREATE PROCEDURE SearchBookByGenre2(IN pname varchar(300))
+CREATE PROCEDURE SearchBookByGenre(IN pName varchar(300))
 BEGIN
 	SELECT
 		g.name as 'Genre',
-		b.book_name as 'Name of Book'
-	FROM book_genre_classification as bg
-    INNER JOIN book_genre as g ON bg.GenreID = g.GenreID
-    INNER JOIN book as b ON bg.BookID = b.BookID
-    where pname = g.name;
+		b.book_name as 'Book Title',
+        concat(ba.firstname, ' ', ba.lastname) as 'Author Name'
+    FROM book_genre_classification AS bg
+    INNER JOIN book_genre AS g ON bg.GenreID = g.GenreID
+    INNER JOIN book AS b ON bg.BookID = b.BookID
+    INNER JOIN book_author_classification AS bac ON bac.BookID = b.BookID
+    INNER JOIN book_author AS ba ON ba.AuthorID = bac.AuthorID
+    WHERE pName = g.name;
     
 END //
-
 DELIMITER ;
 
 -- CALLING THE PROCEDURE --
-call SearchBookByGenre2('fiction');
-call SearchBookByGenre2('Romance');
-
-
+call SearchBookByGenre('fiction');
+call SearchBookByGenre('Romance');
 
 
