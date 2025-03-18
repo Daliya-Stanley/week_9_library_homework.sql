@@ -1,5 +1,5 @@
 -- IF YOU WOULD LIKE TO RUN ANY PROCEDURE PLEASE USE LIBRARY_3 DATABASE --
-USE library_5;
+USE library_3;
 
 
 -- STORED PROCEDURE 1: ADD A NEW LIBRARY MEMBER
@@ -211,6 +211,8 @@ BEGIN
 END //
 DELIMITER ;
 
+SELECT * FROM viewborrowedbooks;
+SELECT * FROM ViewOverdueBooks;
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -319,5 +321,90 @@ DELIMITER ;
 -- CALLING THE PROCEDURE --
 call SearchBookByGenre('fiction');
 call SearchBookByGenre('Romance');
+
+
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- STORED PROCEDURE 5: ADD A NEW BOOK TO THE DATABASE
+DELIMITER //
+CREATE PROCEDURE AddNewBook(
+IN pbook_isbn VARCHAR(50),
+IN pbook_name VARCHAR(300),
+IN ppublishing_date DATE,
+IN pauthor_firstname varchar(50),
+IN pauthor_lastname varchar(100)
+)
+BEGIN
+	DECLARE vbookid INT; 
+    DECLARE vauthorid INT; 
+    
+    -- add new book by inserting a new row in book table --
+    INSERT INTO book(ISBN, book_name, publishing_date)
+    VALUES (pbook_isbn, pbook_name, ppublishing_date);
+    
+    -- set the BookID variable as the ID which was last inserted --
+    SET vbookid = LAST_INSERT_ID();
+    
+    -- check if the author exists by selecting 1 record from the table with the condition --
+	IF EXISTS (SELECT 1 FROM book_author 
+		WHERE firstname = pauthor_firstname AND lastname = pauthor_lastname)
+        
+        -- if it exists, then store the AuthorID into vauthorid variable --
+        THEN SELECT authorid INTO vauthorid 
+        FROM book_author 
+        WHERE firstname = pauthor_firstname AND lastname = pauthor_lastname;
+	ELSE
+		-- if it does not exist, add new row in book_author table and insert the inputted values --
+		INSERT INTO book_author(firstname, lastname)
+		VALUES(pauthor_firstname, pauthor_lastname);
+        -- then set the vauthorid as the last ID insert --
+        SET vauthorid = LAST_INSERT_ID();
+    
+    END IF;
+    -- insert into book author classification bridge table the values for BookID and AuthorID.
+    INSERT INTO book_author_classification(bookid, authorid)
+    VALUES(vbookid, vauthorid);
+    
+END //
+DELIMITER ;
+
+call AddNewBook('‎9780060935467', 'To Kill a Mockingbird', '1960-07-11', 'Harper', 'Lee');
+
+select * from book;
+select * from book_author;
+select * from book_author_classification;
+select * from book_genre_classification;
+
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- STORED PROCEDURE 6: ADD GENRE 
+DELIMITER //
+CREATE PROCEDURE AddGenre(IN pBookID int, IN pGenreName varchar(100))
+BEGIN
+	DECLARE vgenreid int;
+    
+    SELECT GenreID INTO vgenreid FROM book_genre 
+    WHERE name = pGenreName;
+    
+	INSERT INTO book_genre_classification(bookid, genreid)
+    VALUES (pBookID, vgenreid);
+END//
+DELIMITER ;
+
+call AddGenre(1, 'Politics'); -- 1984
+call AddGenre(17, 'Classic'); -- to kill a mockingbird
+call AddGenre(17, 'Fiction');
+
+select * from ViewBookGenres;
+
+CREATE VIEW ViewBookGenres AS
+SELECT b.book_name, GROUP_CONCAT(bg.name) AS 'Genres'
+FROM book b
+INNER JOIN book_genre_classification bgc ON b.BookID = bgc.BookID
+INNER JOIN book_genre bg ON bgc.GenreID = bg.GenreID
+GROUP BY b.BookID;
+
 
 

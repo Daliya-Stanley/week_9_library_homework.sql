@@ -1,9 +1,17 @@
 USE library_5;
 
+-- get all of the Member's information and their membership type and status
+SELECT m.MemberID as 'Member ID', m.firstname as 'Name', m.lastname as 'Surname', m.email 'Email Address', DATE_FORMAT(m.birth_date, '%d %M %Y') as 'Date of Birth', 
+DATE_FORMAT(m.registration_date, '%d %M %Y') as 'Registration Date', mts.membership_status AS 'Membership Status', mtt.membership_type AS 'Membership Type'
+FROM member m
+INNER JOIN member_membership_type mtt ON m.MembershipTypeID = mtt.MembershipTypeID
+INNER JOIN member_membership_status mts ON m.MembershipStatusID = mts.MembershipStatusID
+group by m.Memberid;
+
 -- Counts the number of members in each membership status
 SELECT mts.membership_status, COUNT(m.MemberID) AS 'Member Count'
 FROM member m
-JOIN member_membership_status mts ON m.MembershipStatusID = mts.MembershipStatusID
+RIGHT OUTER JOIN member_membership_status mts ON m.MembershipStatusID = mts.MembershipStatusID
 GROUP BY mts.membership_status;
 
 -- All Authors and the books they have written
@@ -13,6 +21,9 @@ INNER JOIN book_author_classification bac ON ba.AuthorID = bac.AuthorID
 INNER JOIN book b ON bac.BookID = b.BookID
 GROUP BY ba.AuthorID;
 
+-- call AddNewBook('9781503292734', 'Sense and Sensibility', '1811-01-01');
+-- call AddGenre(16, 'Classic')
+-- call AddGenre(16, 'Romance')
 
 -- How many books we have in each genre
 SELECT bg.name AS 'Genre', COUNT(b.BookID) AS 'Book Count'
@@ -71,15 +82,6 @@ GROUP BY r.role_name, wh.start_time, wh.end_time;
 -- JOIN inventory_status s ON i.InventoryStatusID = s.InventoryStatusID
 -- JOIN inventory_condition c ON i.ConditionID = c.ConditionID
 -- WHERE s.status = 'In stock';
-
-
--- get all of the Member's information and their membership type and status
--- SELECT m.MemberID, m.firstname, m.lastname, m.email, m.birth_date, m.registration_date,
---        mts.membership_status AS 'Membership Status', mtt.membership_type AS 'Membership Type'
--- FROM member m
--- INNER JOIN member_membership_type mtt ON m.MembershipTypeID = mtt.MembershipTypeID
--- INNER JOIN member_membership_status mts ON m.MembershipStatusID = mts.MembershipStatusID
--- group by m.Memberid;
 
 
 -- Find members with a specific membership type (this example is adult)

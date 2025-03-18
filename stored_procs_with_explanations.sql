@@ -390,4 +390,49 @@ call SearchBookByGenre2('fiction');
 call SearchBookByGenre2('Romance');
 
 
+-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+-- STORED PROCEDURE 5: ADD A NEW BOOK TO THE DATABASE
+DELIMITER //
+CREATE PROCEDURE AddNewBook(
+IN pbook_isbn VARCHAR(50),
+IN pbook_name VARCHAR(300),
+IN ppublishing_date DATE,
+IN pauthor_firstname varchar(50),
+IN pauthor_lastname varchar(100)
+)
+BEGIN
+	DECLARE vbookid INT; -- for book_author_classification
+    DECLARE vauthorid INT;  -- for book_author determination
+    
+    -- add new book by inserting a new row in book table --
+    INSERT INTO book(ISBN, book_name, publishing_date)
+    VALUES (pbook_isbn, pbook_name, ppublishing_date);
+    
+    -- set the bookID as the ID which was last inserted --
+    SET vbookid = LAST_INSERT_ID();
+    
+    -- check if the author exists by selecting 1 record from the table with the condition --
+	IF EXISTS (
+		SELECT 1 FROM book_author 
+		WHERE firstname = pauthor_firstname AND lastname = pauthor_lastname)
+        -- if it exists, then store the AuthorID into vauthorid variable --
+        THEN SELECT authorid INTO vauthorid 
+        FROM book_author 
+        WHERE firstname = pauthor_firstname AND lastname = pauthor_lastname;
+	ELSE
+		-- if it does not exist, add new row in book_author table and insert the inputted value --
+		INSERT INTO book_author(firstname, lastname)
+		VALUES(pauthor_firstname, pauthor_lastname);
+        -- then set the vauthorid as the last ID insert --
+        SET vauthorid = LAST_INSERT_ID();
+    
+    END IF;
+    --                                                                    --------------------
+    -- insert into book author classification bridge table the values for | BookID | AuthorID |
+    INSERT INTO book_author_classification(bookid, authorid)
+    VALUES(vbookid, vauthorid);
+    
+END //
+DELIMITER ;
